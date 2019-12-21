@@ -1,0 +1,194 @@
+<link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+<link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" />
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" />
+<style>
+  table {
+    width: 100%;
+  }
+  h3 {
+    font-size: 30px;
+  }
+  h1 {
+    font-size: 60px;
+  }
+</style>
+
+<div class="table-responsive bg-primary ">
+  <div class="card border-primary" id="vTeamScore">
+    <div class="card-body">
+      <h1><span class="badge badge-primary"></span></h1>
+      <h3><span class="badge badge-pill badge-secondary"></span></h3>
+
+    </div>
+  </div>
+  <table class="table table table-dark table-bordered" id="vTeamTable">
+  </table>
+  <div class="card border-primary" id="hTeamScore">
+    <div class="card-body">
+      <h1><span class="badge badge-primary"></span></h1>
+      <h3><span class="badge badge-pill badge-secondary"></span></h3>
+    </div>
+  </div>
+  <table class="table table table-dark table-bordered" id="hTeamTable">
+  </table>
+  <button onclick="window.close()">CLOSE</button>
+</div>
+
+
+
+<!-- <a href="javascript:window.close()">Close this Window</a> -->
+
+<script>
+  const ipc = require('electron').ipcRenderer;
+  const axios = require('axios');
+  const moment=require('moment');
+  var $ = require("jquery");
+  var dt = require('datatables.net')(window, $);
+  var vTeamData;
+  var hTeamData;
+  var hTeamId;
+  var vTeamId;
+  const boxscoreURL = 'http://data.nba.net/prod/v1/{{date}}/{{gameid}}_boxscore.json';
+
+  function getGlobalObject() {
+    let sharedObject = require('electron').remote.getGlobal('sharedObject');
+    return sharedObject;
+}
+  ipc.on('id', (e, value) => {
+    console.log(getGlobalObject().Date)
+    let date = moment(getGlobalObject().Date).format('YYYYMMDD');
+    let id=value;
+    console.log(date);
+    console.log(id);
+    const url =boxscoreURL.replace('{{date}}',date).replace('{{gameid}}',id);
+    //console.log(url);
+    getdata(url);
+
+
+  });
+  
+  function getdata(url) {
+      const getScorebox = async () => {
+        const data = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+        const jsonData = await data.json();
+        hTeamId = jsonData.basicGameData.hTeam.teamId;
+        vTeamId = jsonData.basicGameData.vTeam.teamId;
+
+        vTeamData = TeamData(jsonData.stats.activePlayers.filter(x => x.teamId == vTeamId));
+
+        hTeamData = TeamData(jsonData.stats.activePlayers.filter(x => x.teamId == hTeamId));
+
+        var vTScoreData=[jsonData.basicGameData.vTeam.triCode,jsonData.basicGameData.vTeam.score];
+        var hTScoreData=[jsonData.basicGameData.hTeam.triCode,jsonData.basicGameData.hTeam.score];
+
+        initScoreBar($('#vTeamScore'),vTScoreData);
+        initScoreBar($('#hTeamScore'),hTScoreData);
+
+
+        initTable(($('#vTeamTable')),vTeamData);
+        initTable(($('#hTeamTable')),hTeamData);
+
+        return jsonData;
+      };
+      getScorebox();
+    }
+
+  function TeamData(arr) {
+    return arr.map(x => ([
+      `${x.firstName} ${x.lastName}`,
+      x.pos,
+      x.min,
+      x.points,
+      x.totReb,
+      x.assists,
+      x.steals,
+      x.blocks,
+      `${x.fgm}/${x.fga}`,
+      x.fgp,
+      `${x.tpm}/${x.tpa}`,
+      x.tpp,
+      `${x.ftm}/${x.fta}`,
+      x.offReb,
+      x.defReb,
+      x.turnovers,
+      x.pFouls,
+      x.plusMinus
+    ]));
+
+  }
+  function initScoreBar(target,data){
+    target.children().children('h3').children('span').text(data[1]);
+    target.children().children('h1').children('span').text(data[0]);
+  }
+  function initTable(targetTable,data) {    
+    var tb= targetTable.DataTable({
+      data: data,
+      columns: [{
+          title: "姓名"
+        },
+        {
+          title: "位置"
+        },
+        {
+          title: "上場時間"
+        },
+        {
+          title: "得分"
+        },
+        {
+          title: "籃板"
+        },
+        {
+          title: "助攻"
+        },
+        {
+          title: "抄截"
+        },
+        {
+          title: "阻攻"
+        },
+        {
+          title: "投籃命中/ 投籃出手"
+        },
+        {
+          title: "投籃%"
+        },
+        {
+          title: "三分球命中數/三分球出手數"
+        },
+        {
+          title: "三分球%"
+        },
+        {
+          title: "罰球命中/罰球次數"
+        },
+        {
+          title: "進攻籃板"
+        },
+        {
+          title: "防守籃板"
+        },
+        {
+          title: "失誤"
+        },
+        {
+          title: "犯規"
+        },
+        {
+          title: "+/-"
+        }
+      ],
+      "paging": false,
+      "ordering": false,
+      "info": false,
+      "searching": false
+    });
+
+    $(tb.table().header()).addClass('table-info');
+  }
+</script>
