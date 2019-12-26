@@ -1,29 +1,57 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src http://* https://* 'self'; img-src https://*; child-src 'none';">
 
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' http://* "> -->
-    <!-- <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self' http://*"> -->
-    <title>Hello World!</title>
-    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
-    <!-- <script src="./node_modules/bootstrap/dist/js/bootstrap.min.js" ></script> -->
-  </head>
-  <body>
-    <h1>Hello World!</h1>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+  <style>
+    html,
+    body {
+      text-align: center;
+      background-image: url('./img/basketball-ball-dark_21730-10292.jpg');
+      /* Full height */
+      height: 100%;
+
+      /* Center and scale the image nicely */
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+
+    .team {
+      font-weight: bolder;
+      font-size: 35px;
+    }
+
+    .game {
+      color: blue;
+      font-size: 50px;
+    }
+
+    .score {
+      color: red;
+      font-size: 35px;
+    }
+    h1{
+      color:grey
+    }
+  </style>
+</head>
+
+<body>
+  <h1>NBA GAMES</h1>
+  <div class="center">
     <input class="date" type="date" value="">
-    We are using Node.js <span id="node-version"></span>,
-    Chromium <span id="chrome-version"></span>,
-    and Electron <span id="electron-version"></span>.
-    <div class="card" >
-      <ul class="list-group list-group-flush" id="gamelist">
-       
-      </ul>
-    </div>   
-    <div id="console"></div>
-    <!-- You can also require other files to run in this process -->
-    <script type="module" src="./renderer.js"></script>    
-  </body>
+  </div>
+  <div class="card">
+    <ul class="list-group list-group-flush" id="gamelist">
+    </ul>
+  </div>
+  <div id="console"></div>
+  <!-- You can also require other files to run in this process -->
+  <script type="module" src="./renderer.js"></script>
+</body>
+
 </html>

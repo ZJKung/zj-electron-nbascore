@@ -9,8 +9,8 @@ const path = require('path');
 var eventId = 0;
 var isSubscribe = true;
 
-/**
- * 
+/** get main Global variable
+ * return object 
  */
 function getGlobalObject() {
     let sharedObject = require('electron').remote.getGlobal('sharedObject');
@@ -19,57 +19,29 @@ function getGlobalObject() {
 
 const nowDate = moment(getGlobalObject().Date).format('YYYY-MM-DD');
 
+//Init Date
 let datePicker = document.querySelector('.date');
 datePicker.value = nowDate;
 
+
+
+//init date
+awaitGenerateData(moment(getGlobalObject().Date).format('YYYYMMDD'));
+
+//date time change function
 datePicker.addEventListener('change', () => {
     ipcRenderer.send('setDate', moment(datePicker.value).toString());
     console.log(datePicker.value);
     awaitGenerateData(moment(datePicker.value).format('YYYYMMDD').toString());
 });
 
-const replaceText = (selector, text) => {
-    const element = document.getElementById(selector)
-    if (element) element.innerText = text
-}
 
-for (const type of ['chrome', 'node', 'electron']) {
-    replaceText(`${type}-version`, process.versions[type])
-}
-//init date
-awaitGenerateData(moment(getGlobalObject().Date).format('YYYYMMDD'));
-
-
-
-function showBoxScore(btn) {
-    const gameId = btn.id.split('-')[1];
-    const modalPath = path.join('file://', __dirname, `./boxscoreModal.html`);
-    let win = new BrowserWindow({
-        width: 1024,
-        height: 768,
-        transparent: true,
-        frame: false,
-        webPreferences: {
-            nodeIntegration: true
-        }
-    });
-    win.webContents.on('did-finish-load', () => {
-        win.webContents.send('id', gameId);
-    });
-
-    win.on('close', () => {
-        win = null
-    });
-    win.loadURL(modalPath);
-    win.show();
-
-
-}
 //call axios nba api to get date
 function awaitGenerateData(date) {
     //date=moment(getGlobalObject().Date).format('YYYYMMDD')
     getGame(date).then(
         data => {
+            console.log(data);
             //generate table date
             setGameList(data.games);
             //all boxscore elements 
@@ -181,9 +153,9 @@ function setGameList(games) {
         document.getElementById("gamelist").innerHTML +=
             (
                 '<li class="list-group-item font-weight-bolder">' +
-                `Game${index+1} <h4 >${game.vTeam.triCode}</h4> vs <h4 >${game.hTeam.triCode}</h4>
-                ${game.vTeam.score} : ${game.hTeam.score} ` +
-
+                `<div class="game">Game${index+1}</div> <h4 class="team">${game.vTeam.triCode} vs ${game.hTeam.triCode}</h4>`+
+                `<div class="score">${game.statusNum!=1?`${game.vTeam.score} : ${game.hTeam.score}`:``} </div>`+
+                '<div></div>'+
                 `${game.statusNum==2?`<button class="pbp btn-danger" id="pbp-${game.gameId}">Subscribe</button>`:""} ` +
                 `${game.statusNum!=1?`<button class="boxscore btn-primary" id="boxscore-${game.gameId}" ">Boxscore</button>`:""}` +
                 //`${game.isGameActivated?`<button class="pbp btn-danger" id="pbp-${game.gameId}">Follow</button>`:`<button class="boxscore btn-primary" id="boxscore-${game.gameId}">Boxscore</button>`}` +

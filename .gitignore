@@ -1,1 +1,4 @@
 node_modules
+.nab-scorebox
+dist
+nba-scorebox-*

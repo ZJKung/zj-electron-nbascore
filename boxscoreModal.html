@@ -11,6 +11,22 @@
   h1 {
     font-size: 60px;
   }
+  .team{
+    font-size: 50px;
+    color: green;
+    text-align: center;
+  }
+  .card-body{
+    text-align: center;
+  }
+  .score{
+    font-size: 50px;
+    color: greenyellow;
+  }
+  button{
+    margin-left: 50%;
+  }
+  
 </style>
 
 <div class="table-responsive bg-primary ">
@@ -18,7 +34,7 @@
     <div class="card-body">
       <h1><span class="badge badge-primary"></span></h1>
       <h3><span class="badge badge-pill badge-secondary"></span></h3>
-
+      <div><span class="vteam team"> </span> <span class="vscore score"></span></div>
     </div>
   </div>
   <table class="table table table-dark table-bordered" id="vTeamTable">
@@ -27,6 +43,7 @@
     <div class="card-body">
       <h1><span class="badge badge-primary"></span></h1>
       <h3><span class="badge badge-pill badge-secondary"></span></h3>
+      <div><span class="hteam team"> </span> <span class="hscore score"></span></div>
     </div>
   </div>
   <table class="table table table-dark table-bordered" id="hTeamTable">
@@ -86,8 +103,8 @@
         var vTScoreData=[jsonData.basicGameData.vTeam.triCode,jsonData.basicGameData.vTeam.score];
         var hTScoreData=[jsonData.basicGameData.hTeam.triCode,jsonData.basicGameData.hTeam.score];
 
-        initScoreBar($('#vTeamScore'),vTScoreData);
-        initScoreBar($('#hTeamScore'),hTScoreData);
+        initScoreBar('v',vTScoreData);
+        initScoreBar('h',hTScoreData);
 
 
         initTable(($('#vTeamTable')),vTeamData);
@@ -122,8 +139,10 @@
 
   }
   function initScoreBar(target,data){
-    target.children().children('h3').children('span').text(data[1]);
-    target.children().children('h1').children('span').text(data[0]);
+    $(`.${target}score`).text(data[1]);
+    $(`.${target}team`).text(data[0]);
+    // target.children().children('h3').children('span').text(data[1]);
+    // target.children().children('h1').children('span').text(data[0]);
   }
   function initTable(targetTable,data) {    
     var tb= targetTable.DataTable({
